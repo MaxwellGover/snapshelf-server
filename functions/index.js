@@ -69,17 +69,17 @@ function saveImage(url, ticketId) {
 			};
 
 			// Get download url for stored image
-      		bucket.file(`sample/images/${randomFileName}`).getSignedUrl(config, (error, url) => {
-        		if (error) {
-          			return console.error(error.message);
-        		}
+      			bucket.file(`sample/images/${randomFileName}`).getSignedUrl(config, (error, url) => {
+        			if (error) {
+          				return console.error(error.message);
+        			}
 
-        		// Do something with your URL
-        		// (Like save it to Firebase)
+        			// Do something with your URL
+        			// (Like save it to Firebase)
 
-        		console.log(`Your image Firebase Storage URL is: ${url}`);
-        		// getImageOwner(ticketId, /* get downloadURL to use in function */);
-      		});
+        			console.log(`Your image Firebase Storage URL is: ${url}`);
+        			// getImageOwner(ticketId, /* get downloadURL to use in function */);
+      			});
 		});
 	});
 };
