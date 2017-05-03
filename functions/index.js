@@ -26,6 +26,16 @@ exports.getProcessedImage = functions.https.onRequest((req, res) => {
 	res.status(400).end();
 });
 
+exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
+
+  // DEBUG
+  console.log(event);
+
+  // Option 2:
+  // The image (or any file) download link
+  console.log(event.mediaLink);
+});
+
 function saveImage(url, ticketId) {
 
 	// Generate a random HEX string using crypto (a native node module).
@@ -62,6 +72,7 @@ function saveImage(url, ticketId) {
           expires: '05-03-2027'
         };
 
+        // Option 1:
         // Get download url for stored image
         bucket.file(`sample/images/${randomFileName}`)
           .getSignedUrl(config, (error, url) => {
