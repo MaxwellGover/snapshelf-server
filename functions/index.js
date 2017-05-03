@@ -21,7 +21,7 @@ exports.getProcessedImage = functions.https.onRequest((req, res) => {
 	if (req.body && req.body.processedImageURL) {
     	// Get image from Pixelz and save it to Firebase Storage.
     	saveImage(
-    		req.body.processedImageURL, 
+    		req.body.processedImageURL,
     		req.body.imageTicket
     	);
     	return res.status(200).end();
@@ -32,6 +32,7 @@ exports.getProcessedImage = functions.https.onRequest((req, res) => {
 function saveImage(url, ticketId) {
 	// Generate a random HEX string using crypto (a native node module).
 	const randomFileName = crypto.randomBytes(16).toString('hex');
+
 	// Fetch image info using a HTTP HEAD request.
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD
 	request.head(url, (error, info) => {
@@ -57,16 +58,36 @@ function saveImage(url, ticketId) {
 		})
 		.on('finish', () => {
 			// Do something when everything is done.
+			console.log('Image successfully uploaded to Firebase Storage!');
 
 			// Get download url for stored image
-			console.log('Image successfully uploaded to Firebase Storage!');
+
+			// Configure image access
+			const config = {
+  				action: 'read',
+  				expires: '05-03-2018'
+			};
+
+			// Get download url for stored image
+      		bucket.file(`sample/images/${randomFileName}`).getSignedUrl(config, (error, url) => {
+        		if (error) {
+          			return console.error(error.message);
+        		}
+
+        		// Do something with your URL
+        		// (Like save it to Firebase)
+
+        		console.log(`Your image Firebase Storage URL is: ${url}`);
+        		// getImageOwner(ticketId, /* get downloadURL to use in function */);
+      		});
 		});
 	});
-	getImageOwner(/* get ticket and downloadURL to use in function */);
 };
 
+/*
 function getImageOwner (ticketId, downloadURL) {
 	// Loop over all tickets in database and find the match
 	// Get the image owner
 	// Store downloadURL for Firebase to owner/processedImages
 }
+*/
