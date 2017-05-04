@@ -31,9 +31,9 @@ exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
 
   // DEBUG
   console.log(event);
-  
+
   const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/`;
-  const mediaName = event.data.name.replace('/', '%2F');
+  const mediaName = event.data.name.replace(/\//g, '%2F');
   const accessConfig = `?alt=media&token=${event.data.metadata.firebaseStorageDownloadTokens}`;
 
   // The image (or any file) download link
