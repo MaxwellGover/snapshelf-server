@@ -31,7 +31,7 @@ exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
   // DEBUG
   console.log(event);
 
-  const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/`;
+  const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
   const mediaName = event.data.name.replace(/\//g, '%2F');
   const accessConfig = `?alt=media&token=${event.data.metadata.firebaseStorageDownloadTokens}`;
 
