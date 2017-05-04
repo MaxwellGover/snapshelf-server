@@ -27,10 +27,6 @@ exports.getProcessedImage = functions.https.onRequest((req, res) => {
 });
 
 exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
-
-  // DEBUG
-  console.log(event);
-
   const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
   const mediaName = event.data.name.replace(/\//g, '%2F');
   const accessConfig = `?alt=media&token=${event.data.metadata.firebaseStorageDownloadTokens}`;
@@ -38,10 +34,9 @@ exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
   // The image (or any file) download link
   const downloadLink = `${baseUrl}${mediaName}${accessConfig}`;
 
-  console.log(`The download link is: ${downloadLink}`);
-
   // Do something with your URL
   // (Like save it to Firebase Database)
+  console.log(`The download link is: ${downloadLink}`);
 });
 
 function saveImage(url, ticketId) {
