@@ -16,15 +16,14 @@ const gcs = storage({
 const bucket = gcs.bucket(`${bucketName}.appspot.com`);
 
 exports.getProcessedImage = functions.https.onRequest((req, res) => {
-  if (req.body && req.body.processedImageURL) {
 
-		// Get image from Pixelz and save it to Firebase Storage.
+  if (req.method === 'POST' && req.body && req.body.processedImageURL) {
+
+    // Get image from Pixelz and save it to Firebase Storage.
 		saveImage(req.body.processedImageURL, req.body.imageTicket);
+  }
 
-		return res.status(200).end();
-	}
-
-	res.status(400).end();
+	res.status(200).end();
 });
 
 exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
