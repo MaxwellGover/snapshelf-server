@@ -3,37 +3,40 @@ const admin = require('firebase-admin');
 const request = require('request');
 const crypto = require('crypto');
 const storage = require('@google-cloud/storage');
+const bucketName = 'snapshelf-aabb55';
 
 admin.initializeApp(functions.config().firebase);
 
 // Firebase Project ID and Service Account Key.
 const gcs = storage({
-  projectId: 'snapshelf-aabb55',
+  projectId: bucketName,
   keyFilename: './serviceAccountKey.json'
 });
 
-const bucket = gcs.bucket('snapshelf-aabb55.appspot.com');
+const bucket = gcs.bucket(`${bucketName}.appspot.com`);
 
 exports.getProcessedImage = functions.https.onRequest((req, res) => {
-  if (req.body && req.body.processedImageURL) {
 
-		// Get image from Pixelz and save it to Firebase Storage.
+  if (req.method === 'POST' && req.body && req.body.processedImageURL) {
+
+    // Get image from Pixelz and save it to Firebase Storage.
 		saveImage(req.body.processedImageURL, req.body.imageTicket);
+  }
 
-		return res.status(200).end();
-	}
-
-	res.status(400).end();
+	res.status(200).end();
 });
 
 exports.updateProcessedImageUrl = functions.storage.object().onChange(event => {
+  const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}.appspot.com/o/`;
+  const mediaName = event.data.name.replace(/\//g, '%2F');
+  const accessConfig = `?alt=media&token=${event.data.metadata.firebaseStorageDownloadTokens}`;
 
-  // DEBUG
-  console.log(event);
-
-  // Option 2:
   // The image (or any file) download link
-  console.log(event.mediaLink);
+  const downloadLink = `${baseUrl}${mediaName}${accessConfig}`;
+
+  // Do something with your URL
+  // (Like save it to Firebase Database)
+  console.log(`The download link is: ${downloadLink}`);
 });
 
 function saveImage(url, ticketId) {
@@ -64,27 +67,9 @@ function saveImage(url, ticketId) {
         // Do something if the upload fails.
   			console.error(error);
   		}).on('finish', () => {
+
+        // Image successfully downloaded from Pixelz and uploaded to Firebase Storage.
   			console.log('Image successfully uploaded to Firebase Storage!');
-
-        // Configure image access
-        const config = {
-          action: 'read',
-          expires: '05-03-2027'
-        };
-
-        // Option 1:
-        // Get download url for stored image
-        bucket.file(`sample/images/${randomFileName}`)
-          .getSignedUrl(config, (error, url) => {
-            if (error) {
-              return console.error(error);
-            }
-
-            // Do something with your URL
-            // (Like save it to Firebase)
-
-            console.log(`Your image Firebase Storage URL is: ${url}`);
-          });
   		});
 	});
 };
